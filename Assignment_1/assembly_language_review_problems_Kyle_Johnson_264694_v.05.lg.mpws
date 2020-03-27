@@ -1,0 +1,348 @@
+Assignment 1. v.03.
+
+
+Enter your name in the following fold.
+%info
+Kyle Johnson
+%/info
+
+
+======================================================================
+Program 1 (15 points).
+
+Write a program that will copy the 100 bytes that start at "source"
+to "destination".
+
+%uasm65,title=""
+	org 0200h
+	lda #0d
+main:
+    lda source,x
+    sta destination,x
+    inx
+    cpx #100d
+    bne main
+    brk
+
+source:
+	dbt 59d,61d,37d,128d,71d,150d,195d,130d,69d,84d
+	dbt 171d,227d,99d,214d,233d,136d,80d,253d,242d
+	dbt 112d,221d,151d,101d,117d,76d,226d,174d,205d
+	dbt 84d,78d,139d,89d,195d,243d,69d,128d,217d,215d
+	dbt 57d,100d,227d,226d,233d,238d,229d,228d,135d
+	dbt 140d,98d,211d,245d,120d,206d,198d,47d,191d
+	dbt 239d,27d,236d,12d,242d,148d,98d,11d,38d,189d
+	dbt 238d,225d,142d,214d,214d,21d,75d,17d,190d
+	dbt 178d,123d,125d,123d,10d,166d,123d,135d,220d
+	dbt 193d,46d,248d,222d,63d,206d,197d,101d,144d
+	dbt 201d,233d,12d,241d,85d,180d,29d
+	
+destination:
+	dbt 100d(0d)
+
+	end
+
+%/uasm65
+
+    %output,mpversion="314",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A900BD0E029D7202E8E064D0F5003B3D2580479674
+      	S1170214C3824554ABE363D6E98850FDF270DD9765754CE291
+      	S1170228AECD544E8B59C3F34580D9D73964E3E2E9EEE5E490
+      	S117023C878C62D3F578CEC62FBFEF1BEC0CF294620B26BD9B
+      	S1170250EEE18ED6D6154B11BEB27B7D7B0AA67B87DCC12EBC
+      	S1170264F8DE3FCEC56590C9E90CF155B41D00000000000010
+      	S117027800000000000000000000000000000000000000006E
+      	S117028C00000000000000000000000000000000000000005A
+      	S11702A0000000000000000000000000000000000000000046
+      	S11702B4000000000000000000000000000000000000000032
+      	S11102C8000000000000000000000000000024
+      	S9030000FC
+      %/s19
+       
+      *** List File ***
+      
+      0200            000001 |	org 0200h
+      0200 A9 00      000002 |	lda #0d
+      0202            000003 |main:
+      0202 BD 0E 02   000004 |    lda source,x
+      0205 9D 72 02   000005 |    sta destination,x
+      0208 E8         000006 |    inx
+      0209 E0 64      000007 |    cpx #100d
+      020B D0 F5      000008 |    bne main
+      020D 00         000009 |    brk
+                      000010 |
+      020E            000011 |source:
+      020E 3B         000012 |	dbt 59d,61d,37d,128d,71d,150d,195d,130d,69d,84d
+      020F 3D               
+      0210 25               
+      0211 80               
+      0212 47               
+      0213 96               
+      0214 C3               
+      0215 82               
+      0216 45               
+      0217 54               
+      0218 AB         000013 |	dbt 171d,227d,99d,214d,233d,136d,80d,253d,242d
+      0219 E3               
+      021A 63               
+      021B D6               
+      021C E9               
+      021D 88               
+      021E 50               
+      021F FD               
+      0220 F2               
+      0221 70         000014 |	dbt 112d,221d,151d,101d,117d,76d,226d,174d,205d
+      0222 DD               
+      0223 97               
+      0224 65               
+      0225 75               
+      0226 4C               
+      0227 E2               
+      0228 AE               
+      0229 CD               
+      022A 54         000015 |	dbt 84d,78d,139d,89d,195d,243d,69d,128d,217d,215d
+      022B 4E               
+      022C 8B               
+      022D 59               
+      022E C3               
+      022F F3               
+      0230 45               
+      0231 80               
+      0232 D9               
+      0233 D7               
+      0234 39         000016 |	dbt 57d,100d,227d,226d,233d,238d,229d,228d,135d
+      0235 64               
+      0236 E3               
+      0237 E2               
+      0238 E9               
+      0239 EE               
+      023A E5               
+      023B E4               
+      023C 87               
+      023D 8C         000017 |	dbt 140d,98d,211d,245d,120d,206d,198d,47d,191d
+      023E 62               
+      023F D3               
+      0240 F5               
+      0241 78               
+      0242 CE               
+      0243 C6               
+      0244 2F               
+      0245 BF               
+      0246 EF         000018 |	dbt 239d,27d,236d,12d,242d,148d,98d,11d,38d,189d
+      0247 1B               
+      0248 EC               
+      0249 0C               
+      024A F2               
+      024B 94               
+      024C 62               
+      024D 0B               
+      024E 26               
+      024F BD               
+      0250 EE         000019 |	dbt 238d,225d,142d,214d,214d,21d,75d,17d,190d
+      0251 E1               
+      0252 8E               
+      0253 D6               
+      0254 D6               
+      0255 15               
+      0256 4B               
+      0257 11               
+      0258 BE               
+      0259 B2         000020 |	dbt 178d,123d,125d,123d,10d,166d,123d,135d,220d
+      025A 7B               
+      025B 7D               
+      025C 7B               
+      025D 0A               
+      025E A6               
+      025F 7B               
+      0260 87               
+      0261 DC               
+      0262 C1         000021 |	dbt 193d,46d,248d,222d,63d,206d,197d,101d,144d
+      0263 2E               
+      0264 F8               
+      0265 DE               
+      0266 3F               
+      0267 CE               
+      0268 C5               
+      0269 65               
+      026A 90               
+      026B C9         000022 |	dbt 201d,233d,12d,241d,85d,180d,29d
+      026C E9               
+      026D 0C               
+      026E F1               
+      026F 55               
+      0270 B4               
+      0271 1D               
+                      000023 |	
+      0272            000024 |destination:
+      0272 00         000025 |	dbt 100d(0d)
+      0273 00 00 00         
+      0276 00 00 00         
+      0279 00 00 00         
+      027C 00 00 00         
+      027F 00 00 00         
+      0282 00 00 00         
+      0285 00 00 00         
+      0288 00 00 00         
+      028B 00 00 00         
+      028E 00 00 00         
+      0291 00 00 00         
+      0294 00 00 00         
+      0297 00 00 00         
+      029A 00 00 00         
+      029D 00 00 00         
+      02A0 00 00 00         
+      02A3 00 00 00         
+      02A6 00 00 00         
+      02A9 00 00 00         
+      02AC 00 00 00         
+      02AF 00 00 00         
+      02B2 00 00 00         
+      02B5 00 00 00         
+      02B8 00 00 00         
+      02BB 00 00 00         
+      02BE 00 00 00         
+      02C1 00 00 00         
+      02C4 00 00 00         
+      02C7 00 00 00         
+      02CA 00 00 00         
+      02CD 00 00 00         
+      02D0 00 00 00         
+      02D3 00 00 00         
+                      000026 |
+                      000027 |	end
+      
+      *** Symbol Table ***
+      {MAIN=514, SOURCE=526, DESTINATION=626, =0}
+.   %/output
+
+
+
+
+======================================================================
+Program 2 (15 points).
+
+Write a program that will capitalize all the letters in the string 
+that starts at "string1".
+
+%uasm65,title=""
+	org 0200h
+
+main:
+;Place your program code here.
+
+
+string1:
+	dbt "A bird in the hand is worth two in the bush. Early to bed and "
+	dbt "early to rise makes a person healthy, wealthy, and wise."
+	dbt 0d
+	
+	end
+%/uasm65
+
+
+
+
+======================================================================
+Program 3 (15 points).
+
+Write a program that exchanges the upper and lower nibbles in the 
+100 bytes that begin at "numbers".
+
+%uasm65,title=""
+	org 0200h
+
+main:
+;Place your program code here.
+
+
+numbers:
+	dbt 1Fh,4Dh,38h,4Ch,23h,D9h,FCh,36h,CFh,17h,35h,70h
+	dbt 8Fh,9Eh,20h,9Bh,27h,2Ch,7Bh,30h,E4h,7Ch,9Bh,89h
+	dbt EAh,78h,A0h,52h,28h,D5h,DCh,69h,88h,75h,80h,7Dh
+	dbt D7h,55h,9Dh,BCh,12h,D2h,7Fh,DEh,92h,11h,8Ah,E6h
+	dbt AFh,5Eh,89h,D4h,92h,5Ah,A2h,B8h,BBh,B6h,D8h,54h
+	dbt DBh,5Dh,58h,B9h,7Eh,CDh,72h,19h,2Ch,7Ch,77h,30h
+	dbt 7Ch,19h,6Eh,89h,B5h,66h,C2h,EFh,89h,96h,F3h,63h
+	dbt 82h,F0h,56h,DCh,9Ah,7Eh,FCh,29h,B4h,B3h,CDh,3Dh
+	dbt 58h,BEh,DCh,44h
+
+	end
+
+%/uasm65
+
+
+
+
+======================================================================
+Program 4 (15 points).
+
+Write a program that contains a subroutine that prints the string
+"A stitch in time saves nine." Have the main program call the subroutine
+3 times.
+
+
+%uasm65,title=""
+	org 0200h
+
+main:
+;Place your program code here.
+
+
+
+	end
+
+%/uasm65
+
+
+
+
+======================================================================
+Program 5 (15 points).
+
+Write a program that will sort the 100 integers starting at "numbers"
+into ascending order.
+
+%uasm65,title=""
+	org 0200h
+
+main:
+;Place your program code here.
+
+
+numbers:
+	dbt 59d,61d,37d,128d,71d,150d,195d,130d,69d,84d
+	dbt 171d,227d,99d,214d,233d,136d,80d,253d,242d
+	dbt 112d,221d,151d,101d,117d,76d,226d,174d,205d
+	dbt 84d,78d,139d,89d,195d,243d,69d,128d,217d,215d
+	dbt 57d,100d,227d,226d,233d,238d,229d,228d,135d
+	dbt 140d,98d,211d,245d,120d,206d,198d,47d,191d
+	dbt 239d,27d,236d,12d,242d,148d,98d,11d,38d,189d
+	dbt 238d,225d,142d,214d,214d,21d,75d,17d,190d
+	dbt 178d,123d,125d,123d,10d,166d,123d,135d,220d
+	dbt 193d,46d,248d,222d,63d,206d,197d,101d,144d
+	dbt 201d,233d,12d,241d,85d,180d,29d
+
+	end
+
+%/uasm65
+
+
+
+======================================================================
+Program 6 (25 points).
+
+Write a program that enables the user to use some of the switches that
+are at memory location A600 to move a single light around the 8x2 grid
+of LEDs that are formed by memory locations A200h and A400h.
+
+%uasm65,title=""
+	org 0200h
+
+
+	end
+
+%/uasm65
