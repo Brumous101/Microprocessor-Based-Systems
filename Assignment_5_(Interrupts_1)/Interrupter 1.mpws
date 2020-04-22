@@ -1,0 +1,817 @@
+%uasm65,title="Interrupt example code."
+; v.001
+
+IRQVect: equ 0002d
+
+OutChar: equ 0e003h
+
+
+    org 0200h
+
+; ======= Initialization.
+    ; Point the IRQ vector to the
+    ; interrupt handler.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+   
+    ; Enable interrupts.
+    cli
+   
+; ======= Main program
+Loop:
+    jmp Loop
+   
+   
+; ======= Interrupt Handler
+InterruptHandler:
+    lda #'A'
+    jsr OutChar
+   
+    ; Enable interrupts.
+    cli
+   
+    rti
+   
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A90E8D0200A9028D0300584C0B02A9412003E0586F
+      	S104021440A5
+      	S9030000FC
+      %/s19
+       
+      *** List File ***
+      
+                      000001 |; v.001
+                      000002 |
+      0000            000003 |IRQVect: equ 0002d
+                      000004 |
+      0000            000005 |OutChar: equ 0e003h
+                      000006 |
+                      000007 |
+      0200            000008 |    org 0200h
+                      000009 |
+                      000010 |; ======= Initialization.
+                      000011 |    ; Point the IRQ vector to the
+                      000012 |    ; interrupt handler.
+      0200 A9 0E      000013 |    lda #InterruptHandler<
+      0202 8D 02 00   000014 |    sta IRQVect
+      0205 A9 02      000015 |    lda #InterruptHandler>
+      0207 8D 03 00   000016 |    sta IRQVect+1d
+                      000017 |   
+                      000018 |    ; Enable interrupts.
+      020A 58         000019 |    cli
+                      000020 |   
+                      000021 |; ======= Main program
+      020B            000022 |Loop:
+      020B 4C 0B 02   000023 |    jmp Loop
+                      000024 |   
+                      000025 |   
+                      000026 |; ======= Interrupt Handler
+      020E            000027 |InterruptHandler:
+      020E A9 41      000028 |    lda #'A'
+      0210 20 03 E0   000029 |    jsr OutChar
+                      000030 |   
+                      000031 |    ; Enable interrupts.
+      0213 58         000032 |    cli
+                      000033 |   
+      0214 40         000034 |    rti
+                      000035 |   
+                      000036 |    end
+      
+      *** Symbol Table ***
+      {OUTCHAR=57347, INTERRUPTHANDLER=526, LOOP=523, IRQVECT=2, =0}
+.   %/output
+%uasm65,title="Timer driven interrupt example program"
+; v.003
+; Increment port 0A200h at a rate of once increment
+; per second. Use the timer based interrupt handler
+; to control the time delay.
+
+
+T1LL:  equ B006h
+T1LH:  equ B007h
+IER:   equ B00Eh
+ACR:   equ B00Bh
+
+COUNTDOWN: equ 500d
+ 
+IRQVect: equ 0002d
+
+OutChar: equ 0e003h
+PrntMess: equ 0e00ch
+
+    org 0200h
+    
+    lda #0d
+  
+    sta IER             ; Disable all interrupts.
+    lda #11000000b
+    sta ACR             ; Set to T1 free running mode;
+  
+    lda #COUNTDOWN<
+    sta T1LL            ; Low byte of latch.
+    lda #COUNTDOWN>
+    sta T1LH            ; High byte of latch.
+ 
+
+    ; Initialize the interrupt vector.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+  
+    lda #01000000b
+    sta IER        ; Enable all interrupts on the 6522.
+  
+    cli            ; Enable interrupts
+  
+  
+  
+MainLoop:
+    nop
+    jmp MainLoop
+  
+  
+  
+InterruptHandler:
+
+
+
+    sei   ;Disable interrupts.
+
+;Save registers on the stack.
+    php
+    pha
+    txa
+    pha
+    tya
+    pha
+   
+    inc 0a200h
+
+;Restore registers from the stack.
+    pla
+    tay
+    pla
+    tax
+    pla
+    plp
+
+    cli    ; Enable interrupts.
+  
+    rti    ; Return from interrupt.
+
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A9008D0EB0A9C08D0BB0A9F48D06B0A9018D07B073
+      	S1170214A9288D0200A9028D0300A9408D0EB058EA4C24024F
+      	S11502287808488A489848EE00A268A868AA682858406C
+      	S9030000FC
+      %/s19
+       
+      *** List File ***
+      
+                      000001 |; v.003
+                      000002 |; Increment port 0A200h at a rate of once increment
+                      000003 |; per second. Use the timer based interrupt handler
+                      000004 |; to control the time delay.
+                      000005 |
+                      000006 |
+      0000            000007 |T1LL:  equ B006h
+      0000            000008 |T1LH:  equ B007h
+      0000            000009 |IER:   equ B00Eh
+      0000            000010 |ACR:   equ B00Bh
+                      000011 |
+      0000            000012 |COUNTDOWN: equ 500d
+                      000013 | 
+      0000            000014 |IRQVect: equ 0002d
+                      000015 |
+      0000            000016 |OutChar: equ 0e003h
+      0000            000017 |PrntMess: equ 0e00ch
+                      000018 |
+      0200            000019 |    org 0200h
+                      000020 |    
+      0200 A9 00      000021 |    lda #0d
+                      000022 |  
+      0202 8D 0E B0   000023 |    sta IER             ; Disable all interrupts.
+      0205 A9 C0      000024 |    lda #11000000b
+      0207 8D 0B B0   000025 |    sta ACR             ; Set to T1 free running mode;
+                      000026 |  
+      020A A9 F4      000027 |    lda #COUNTDOWN<
+      020C 8D 06 B0   000028 |    sta T1LL            ; Low byte of latch.
+      020F A9 01      000029 |    lda #COUNTDOWN>
+      0211 8D 07 B0   000030 |    sta T1LH            ; High byte of latch.
+                      000031 | 
+                      000032 |
+                      000033 |    ; Initialize the interrupt vector.
+      0214 A9 28      000034 |    lda #InterruptHandler<
+      0216 8D 02 00   000035 |    sta IRQVect
+      0219 A9 02      000036 |    lda #InterruptHandler>
+      021B 8D 03 00   000037 |    sta IRQVect+1d
+                      000038 |  
+      021E A9 40      000039 |    lda #01000000b
+      0220 8D 0E B0   000040 |    sta IER        ; Enable all interrupts on the 6522.
+                      000041 |  
+      0223 58         000042 |    cli            ; Enable interrupts
+                      000043 |  
+                      000044 |  
+                      000045 |  
+      0224            000046 |MainLoop:
+      0224 EA         000047 |    nop
+      0225 4C 24 02   000048 |    jmp MainLoop
+                      000049 |  
+                      000050 |  
+                      000051 |  
+      0228            000052 |InterruptHandler:
+                      000053 |
+                      000054 |
+                      000055 |
+      0228 78         000056 |    sei   ;Disable interrupts.
+                      000057 |
+                      000058 |;Save registers on the stack.
+      0229 08         000059 |    php
+      022A 48         000060 |    pha
+      022B 8A         000061 |    txa
+      022C 48         000062 |    pha
+      022D 98         000063 |    tya
+      022E 48         000064 |    pha
+                      000065 |   
+      022F EE 00 A2   000066 |    inc 0a200h
+                      000067 |
+                      000068 |;Restore registers from the stack.
+      0232 68         000069 |    pla
+      0233 A8         000070 |    tay
+      0234 68         000071 |    pla
+      0235 AA         000072 |    tax
+      0236 68         000073 |    pla
+      0237 28         000074 |    plp
+                      000075 |
+      0238 58         000076 |    cli    ; Enable interrupts.
+                      000077 |  
+      0239 40         000078 |    rti    ; Return from interrupt.
+                      000079 |
+                      000080 |    end
+      
+      *** Symbol Table ***
+      {PRNTMESS=57356, T1LH=45063, COUNTDOWN=500, ACR=45067, IER=45070, IRQVECT=2, MAINLOOP=548, OUTCHAR=57347, INTERRUPTHANDLER=552, =0, T1LL=45062}
+.   %/output
+
+%uasm65,title="Program 1"
+IRQVect: equ 0002d
+
+OutChar: equ 0e003h
+
+
+    org 0200h
+
+    ; Initialize the interrupt vector.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+   
+    ; Enable interrupts.
+    cli
+   
+; ======= Main program
+Loop:
+    lda #'H'
+    jsr OutChar
+    lda #'e'
+    jsr OutChar
+    lda #'l'
+    jsr OutChar
+    lda #'l'
+    jsr OutChar
+    lda #'o'
+    jsr OutChar
+    lda #0ah
+    jsr OutChar
+    ldx 255d
+    ldy 2d
+Delay:    
+    dex
+    cpx 0d
+    bne Delay
+    
+    dey
+    cpy 0d
+    bne Delay
+    
+    jmp Loop
+    
+InterruptHandler:
+    lda #'T'
+    jsr OutChar
+    lda #'h'
+    jsr OutChar
+    lda #'e'
+    jsr OutChar
+    lda #'r'
+    jsr OutChar
+    lda #'e'
+    jsr OutChar
+    lda #0ah
+    jsr OutChar
+    ; Enable interrupts.
+    cli
+    rti
+   
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A93E8D0200A9028D030058A9482003E0A9652003B8
+      	S1170214E0A96C2003E0A96C2003E0A96F2003E0A90A2003D1
+      	S1170228E0AEFF00AC0200CAEC0000D0FA88CC0000D0F44C9F
+      	S117023C0B02A9542003E0A9682003E0A9652003E0A972203D
+      	S111025003E0A9652003E0A90A2003E058405A
+      	S9030000FC
+      %/s19
+        
+      *** List File ***
+      
+      0000            000001 |IRQVect: equ 0002d
+                      000002 |
+      0000            000003 |OutChar: equ 0e003h
+                      000004 |
+                      000005 |
+      0200            000006 |    org 0200h
+                      000007 |
+                      000008 |    ; Initialize the interrupt vector.
+      0200 A9 3E      000009 |    lda #InterruptHandler<
+      0202 8D 02 00   000010 |    sta IRQVect
+      0205 A9 02      000011 |    lda #InterruptHandler>
+      0207 8D 03 00   000012 |    sta IRQVect+1d
+                      000013 |   
+                      000014 |    ; Enable interrupts.
+      020A 58         000015 |    cli
+                      000016 |   
+                      000017 |; ======= Main program
+      020B            000018 |Loop:
+      020B A9 48      000019 |    lda #'H'
+      020D 20 03 E0   000020 |    jsr OutChar
+      0210 A9 65      000021 |    lda #'e'
+      0212 20 03 E0   000022 |    jsr OutChar
+      0215 A9 6C      000023 |    lda #'l'
+      0217 20 03 E0   000024 |    jsr OutChar
+      021A A9 6C      000025 |    lda #'l'
+      021C 20 03 E0   000026 |    jsr OutChar
+      021F A9 6F      000027 |    lda #'o'
+      0221 20 03 E0   000028 |    jsr OutChar
+      0224 A9 0A      000029 |    lda #0ah
+      0226 20 03 E0   000030 |    jsr OutChar
+      0229 AE FF 00   000031 |    ldx 255d
+      022C AC 02 00   000032 |    ldy 2d
+      022F            000033 |Delay:    
+      022F CA         000034 |    dex
+      0230 EC 00 00   000035 |    cpx 0d
+      0233 D0 FA      000036 |    bne Delay
+                      000037 |    
+      0235 88         000038 |    dey
+      0236 CC 00 00   000039 |    cpy 0d
+      0239 D0 F4      000040 |    bne Delay
+                      000041 |    
+      023B 4C 0B 02   000042 |    jmp Loop
+                      000043 |    
+      023E            000044 |InterruptHandler:
+      023E A9 54      000045 |    lda #'T'
+      0240 20 03 E0   000046 |    jsr OutChar
+      0243 A9 68      000047 |    lda #'h'
+      0245 20 03 E0   000048 |    jsr OutChar
+      0248 A9 65      000049 |    lda #'e'
+      024A 20 03 E0   000050 |    jsr OutChar
+      024D A9 72      000051 |    lda #'r'
+      024F 20 03 E0   000052 |    jsr OutChar
+      0252 A9 65      000053 |    lda #'e'
+      0254 20 03 E0   000054 |    jsr OutChar
+      0257 A9 0A      000055 |    lda #0ah
+      0259 20 03 E0   000056 |    jsr OutChar
+                      000057 |    ; Enable interrupts.
+      025C 58         000058 |    cli
+      025D 40         000059 |    rti
+                      000060 |   
+                      000061 |    end
+      
+      *** Symbol Table ***
+      {DELAY=559, OUTCHAR=57347, INTERRUPTHANDLER=574, LOOP=523, IRQVECT=2, =0}
+.   %/output
+
+
+%uasm65,title="Program 2"
+T1LL:  equ B006h
+T1LH:  equ B007h
+IER:   equ B00Eh
+ACR:   equ B00Bh
+COUNTDOWN: equ 1000d 
+IRQVect: equ 0002d
+OutChar: equ 0e003h
+PrntMess: equ 0e00ch
+
+    org 0200h    
+    lda #0d  
+    sta IER             ; Disable all interrupts.
+    lda #11000000b
+    sta ACR             ; Set to T1 free running mode;
+    lda #COUNTDOWN<
+    sta T1LL            ; Low byte of latch.
+    lda #COUNTDOWN>
+    sta T1LH            ; High byte of latch.
+    ; Initialize the interrupt vector.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+    lda #01000000b
+    sta IER        ; Enable all interrupts on the 6522.
+    cli            ; Enable interrupts
+MainLoop:
+    nop
+    jmp MainLoop
+InterruptHandler:
+    sei   ;Disable interrupts.
+    
+    lda #'H'
+    jsr OutChar
+    lda #'e'
+    jsr OutChar
+    lda #'l'
+    jsr OutChar
+    lda #'l'
+    jsr OutChar
+    lda #'o'
+    jsr OutChar
+    lda #0ah
+    jsr OutChar
+    
+    cli    ; Enable interrupts.
+    rti    ; Return from interrupt.
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A9008D0EB0A9C08D0BB0A9E88D06B0A9038D07B07D
+      	S1170214A9288D0200A9028D0300A9408D0EB058EA4C24024F
+      	S117022878A9482003E0A9652003E0A96C2003E0A96C2003F1
+      	S110023CE0A96F2003E0A90A2003E0584068
+      	S9030000FC
+      %/s19
+         
+      *** List File ***
+      
+      0000            000001 |T1LL:  equ B006h
+      0000            000002 |T1LH:  equ B007h
+      0000            000003 |IER:   equ B00Eh
+      0000            000004 |ACR:   equ B00Bh
+      0000            000005 |COUNTDOWN: equ 1000d 
+      0000            000006 |IRQVect: equ 0002d
+      0000            000007 |OutChar: equ 0e003h
+      0000            000008 |PrntMess: equ 0e00ch
+                      000009 |
+      0200            000010 |    org 0200h    
+      0200 A9 00      000011 |    lda #0d  
+      0202 8D 0E B0   000012 |    sta IER             ; Disable all interrupts.
+      0205 A9 C0      000013 |    lda #11000000b
+      0207 8D 0B B0   000014 |    sta ACR             ; Set to T1 free running mode;
+      020A A9 E8      000015 |    lda #COUNTDOWN<
+      020C 8D 06 B0   000016 |    sta T1LL            ; Low byte of latch.
+      020F A9 03      000017 |    lda #COUNTDOWN>
+      0211 8D 07 B0   000018 |    sta T1LH            ; High byte of latch.
+                      000019 |    ; Initialize the interrupt vector.
+      0214 A9 28      000020 |    lda #InterruptHandler<
+      0216 8D 02 00   000021 |    sta IRQVect
+      0219 A9 02      000022 |    lda #InterruptHandler>
+      021B 8D 03 00   000023 |    sta IRQVect+1d
+      021E A9 40      000024 |    lda #01000000b
+      0220 8D 0E B0   000025 |    sta IER        ; Enable all interrupts on the 6522.
+      0223 58         000026 |    cli            ; Enable interrupts
+      0224            000027 |MainLoop:
+      0224 EA         000028 |    nop
+      0225 4C 24 02   000029 |    jmp MainLoop
+      0228            000030 |InterruptHandler:
+      0228 78         000031 |    sei   ;Disable interrupts.
+                      000032 |    
+      0229 A9 48      000033 |    lda #'H'
+      022B 20 03 E0   000034 |    jsr OutChar
+      022E A9 65      000035 |    lda #'e'
+      0230 20 03 E0   000036 |    jsr OutChar
+      0233 A9 6C      000037 |    lda #'l'
+      0235 20 03 E0   000038 |    jsr OutChar
+      0238 A9 6C      000039 |    lda #'l'
+      023A 20 03 E0   000040 |    jsr OutChar
+      023D A9 6F      000041 |    lda #'o'
+      023F 20 03 E0   000042 |    jsr OutChar
+      0242 A9 0A      000043 |    lda #0ah
+      0244 20 03 E0   000044 |    jsr OutChar
+                      000045 |    
+      0247 58         000046 |    cli    ; Enable interrupts.
+      0248 40         000047 |    rti    ; Return from interrupt.
+                      000048 |    end
+      
+      *** Symbol Table ***
+      {PRNTMESS=57356, T1LH=45063, COUNTDOWN=1000, ACR=45067, IER=45070, IRQVECT=2, MAINLOOP=548, OUTCHAR=57347, INTERRUPTHANDLER=552, =0, T1LL=45062}
+.   %/output
+
+%uasm65,title="Program 3"
+
+T1LL:  equ B006h
+T1LH:  equ B007h
+IER:   equ B00Eh
+ACR:   equ B00Bh
+COUNTDOWN: equ 2000d
+IRQVect: equ 0002d
+OutChar: equ 0e003h
+PrntMess: equ 0e00ch
+
+    org 0200h
+    lda #0d
+    sta IER             ; Disable all interrupts.
+    lda #11000000b
+    sta ACR             ; Set to T1 free running mode;
+    lda #COUNTDOWN<
+    sta T1LL            ; Low byte of latch.
+    lda #COUNTDOWN>
+    sta T1LH            ; High byte of latch.
+    ; Initialize the interrupt vector.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+    lda #01000000b
+    sta IER
+    cli
+    
+MainLoop:
+    nop
+    jmp MainLoop
+    
+InterruptHandler:
+    inc 0a200h
+    lda 0a200h
+    and #00001111b
+    sta 0a200h
+    cli
+    rti
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A9008D0EB0A9C08D0BB0A9D08D06B0A9078D07B091
+      	S1170214A9288D0200A9028D0300A9408D0EB058EA4C24024F
+      	S1100228EE00A2AD00A2290F8D00A25840E7
+      	S9030000FC
+      %/s19
+       
+      *** List File ***
+      
+                      000001 |
+      0000            000002 |T1LL:  equ B006h
+      0000            000003 |T1LH:  equ B007h
+      0000            000004 |IER:   equ B00Eh
+      0000            000005 |ACR:   equ B00Bh
+      0000            000006 |COUNTDOWN: equ 2000d
+      0000            000007 |IRQVect: equ 0002d
+      0000            000008 |OutChar: equ 0e003h
+      0000            000009 |PrntMess: equ 0e00ch
+                      000010 |
+      0200            000011 |    org 0200h
+      0200 A9 00      000012 |    lda #0d
+      0202 8D 0E B0   000013 |    sta IER             ; Disable all interrupts.
+      0205 A9 C0      000014 |    lda #11000000b
+      0207 8D 0B B0   000015 |    sta ACR             ; Set to T1 free running mode;
+      020A A9 D0      000016 |    lda #COUNTDOWN<
+      020C 8D 06 B0   000017 |    sta T1LL            ; Low byte of latch.
+      020F A9 07      000018 |    lda #COUNTDOWN>
+      0211 8D 07 B0   000019 |    sta T1LH            ; High byte of latch.
+                      000020 |    ; Initialize the interrupt vector.
+      0214 A9 28      000021 |    lda #InterruptHandler<
+      0216 8D 02 00   000022 |    sta IRQVect
+      0219 A9 02      000023 |    lda #InterruptHandler>
+      021B 8D 03 00   000024 |    sta IRQVect+1d
+      021E A9 40      000025 |    lda #01000000b
+      0220 8D 0E B0   000026 |    sta IER
+      0223 58         000027 |    cli
+                      000028 |    
+      0224            000029 |MainLoop:
+      0224 EA         000030 |    nop
+      0225 4C 24 02   000031 |    jmp MainLoop
+                      000032 |    
+      0228            000033 |InterruptHandler:
+      0228 EE 00 A2   000034 |    inc 0a200h
+      022B AD 00 A2   000035 |    lda 0a200h
+      022E 29 0F      000036 |    and #00001111b
+      0230 8D 00 A2   000037 |    sta 0a200h
+      0233 58         000038 |    cli
+      0234 40         000039 |    rti
+                      000040 |    end
+      
+      *** Symbol Table ***
+      {PRNTMESS=57356, T1LH=45063, COUNTDOWN=2000, ACR=45067, IER=45070, IRQVECT=2, MAINLOOP=548, OUTCHAR=57347, INTERRUPTHANDLER=552, =0, T1LL=45062}
+.   %/output
+
+%uasm65,title="Program 4"
+T1LL:  equ B006h
+T1LH:  equ B007h
+IER:   equ B00Eh
+ACR:   equ B00Bh
+COUNTDOWN: equ 2000d
+IRQVect: equ 0002d
+OutChar: equ 0e003h
+PrntMess: equ 0e00ch
+
+    org 0200h
+    lda #0d
+    sta IER             ; Disable all interrupts.
+    lda #11000000b
+    sta ACR             ; Set to T1 free running mode;
+    lda #COUNTDOWN<
+    sta T1LL            ; Low byte of latch.
+    lda #COUNTDOWN>
+    sta T1LH            ; High byte of latch.
+    ; Initialize the interrupt vector.
+    lda #InterruptHandler<
+    sta IRQVect
+    lda #InterruptHandler>
+    sta IRQVect+1d
+    lda #01000000b
+    sta IER
+    cli
+    
+MainLoop:
+    nop
+    jmp MainLoop
+    
+HalfSpeed:
+    inc temp
+    lda temp
+    and #00001111b
+    sta temp
+    
+    jmp MainLoop
+    
+InterruptHandler:
+    inc temp2
+    lda temp2
+    and #00001111b
+    sta temp2
+    
+    asl temp2
+    asl temp2
+    asl temp2
+    asl temp2
+    
+    lda temp2
+    ora temp
+    sta 0a200h
+    
+    lsr temp2
+    lsr temp2
+    lsr temp2
+    lsr temp2
+    
+    lda temp2
+    sta temp2
+    
+    ;lda temp
+    ;sta 0a200h
+    
+    lda temp2
+    and #00000001b
+    cmp #00000001b
+    beq HalfSpeed
+    
+    cli
+    rti
+temp:
+    dbt 0d
+temp2:
+    dbt 0d
+    
+    end
+%/uasm65
+
+    %output,mpversion="316",preserve="false"
+      *** Executable Code ***
+      
+      %s19,description="Execute this fold to send program to U6502 monitor.",preserve="false"
+      	S00700005541534DC2
+      	S1170200A9008D0EB0A9C08D0BB0A9D08D06B0A9078D07B091
+      	S1170214A9368D0200A9028D0300A9408D0EB058EA4C240241
+      	S1170228EE7302AD7302290F8D73024C2402EE7402AD740206
+      	S117023C290F8D74020E74020E74020E74020E7402AD74023C
+      	S11702500D73028D00A24E74024E74024E74024E7402AD74B4
+      	S1140264028D7402AD74022901C901F0B7584000002A
+      	S9030000FC
+      %/s19
+       
+      *** List File ***
+      
+      0000            000001 |T1LL:  equ B006h
+      0000            000002 |T1LH:  equ B007h
+      0000            000003 |IER:   equ B00Eh
+      0000            000004 |ACR:   equ B00Bh
+      0000            000005 |COUNTDOWN: equ 2000d
+      0000            000006 |IRQVect: equ 0002d
+      0000            000007 |OutChar: equ 0e003h
+      0000            000008 |PrntMess: equ 0e00ch
+                      000009 |
+      0200            000010 |    org 0200h
+      0200 A9 00      000011 |    lda #0d
+      0202 8D 0E B0   000012 |    sta IER             ; Disable all interrupts.
+      0205 A9 C0      000013 |    lda #11000000b
+      0207 8D 0B B0   000014 |    sta ACR             ; Set to T1 free running mode;
+      020A A9 D0      000015 |    lda #COUNTDOWN<
+      020C 8D 06 B0   000016 |    sta T1LL            ; Low byte of latch.
+      020F A9 07      000017 |    lda #COUNTDOWN>
+      0211 8D 07 B0   000018 |    sta T1LH            ; High byte of latch.
+                      000019 |    ; Initialize the interrupt vector.
+      0214 A9 36      000020 |    lda #InterruptHandler<
+      0216 8D 02 00   000021 |    sta IRQVect
+      0219 A9 02      000022 |    lda #InterruptHandler>
+      021B 8D 03 00   000023 |    sta IRQVect+1d
+      021E A9 40      000024 |    lda #01000000b
+      0220 8D 0E B0   000025 |    sta IER
+      0223 58         000026 |    cli
+                      000027 |    
+      0224            000028 |MainLoop:
+      0224 EA         000029 |    nop
+      0225 4C 24 02   000030 |    jmp MainLoop
+                      000031 |    
+      0228            000032 |HalfSpeed:
+      0228 EE 73 02   000033 |    inc temp
+      022B AD 73 02   000034 |    lda temp
+      022E 29 0F      000035 |    and #00001111b
+      0230 8D 73 02   000036 |    sta temp
+                      000037 |    
+      0233 4C 24 02   000038 |    jmp MainLoop
+                      000039 |    
+      0236            000040 |InterruptHandler:
+      0236 EE 74 02   000041 |    inc temp2
+      0239 AD 74 02   000042 |    lda temp2
+      023C 29 0F      000043 |    and #00001111b
+      023E 8D 74 02   000044 |    sta temp2
+                      000045 |    
+      0241 0E 74 02   000046 |    asl temp2
+      0244 0E 74 02   000047 |    asl temp2
+      0247 0E 74 02   000048 |    asl temp2
+      024A 0E 74 02   000049 |    asl temp2
+                      000050 |    
+      024D AD 74 02   000051 |    lda temp2
+      0250 0D 73 02   000052 |    ora temp
+      0253 8D 00 A2   000053 |    sta 0a200h
+                      000054 |    
+      0256 4E 74 02   000055 |    lsr temp2
+      0259 4E 74 02   000056 |    lsr temp2
+      025C 4E 74 02   000057 |    lsr temp2
+      025F 4E 74 02   000058 |    lsr temp2
+                      000059 |    
+      0262 AD 74 02   000060 |    lda temp2
+      0265 8D 74 02   000061 |    sta temp2
+                      000062 |    
+                      000063 |    ;lda temp
+                      000064 |    ;sta 0a200h
+                      000065 |    
+      0268 AD 74 02   000066 |    lda temp2
+      026B 29 01      000067 |    and #00000001b
+      026D C9 01      000068 |    cmp #00000001b
+      026F F0 B7      000069 |    beq HalfSpeed
+                      000070 |    
+      0271 58         000071 |    cli
+      0272 40         000072 |    rti
+      0273            000073 |temp:
+      0273 00         000074 |    dbt 0d
+      0274            000075 |temp2:
+      0274 00         000076 |    dbt 0d
+                      000077 |    
+                      000078 |    end
+      
+      *** Symbol Table ***
+      {PRNTMESS=57356, HALFSPEED=552, T1LH=45063, COUNTDOWN=2000, ACR=45067, IER=45070, IRQVECT=2, TEMP2=628, MAINLOOP=548, OUTCHAR=57347, TEMP=627, INTERRUPTHANDLER=566, =0, T1LL=45062}
+.   %/output
+
